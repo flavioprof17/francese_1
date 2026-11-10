@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#cfe3df">
+<meta name="author" content="Prof. Flavio">
+<title>Mon carnet de français</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Baloo+2:wght@500;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#2d4a45;--ink2:#6f8581;--paper:#fffdf6;--line:#d9e6f2;--margin:#f4a6a6;--blue:#1d3a8a;
+--y:#ffe9a8;--p:#ffd3dc;--b:#cfe6ff;--g:#d4f2d2;--o:#ffdcbf;--v:#e5dbff;--w:#f1ede2;
+--ok:#2e8b57;--okbg:#d4f2d2;--ko:#b3304a;--kobg:#ffd3dc}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%}
+body{font-family:'Baloo 2',system-ui,sans-serif;background:#cfe3df;color:var(--ink)}
+button{font:inherit;color:inherit}
+#app{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;position:relative;display:flex;flex-direction:column;
+ background:var(--paper) repeating-linear-gradient(var(--paper) 0 31px,var(--line) 31px 32px);
+ box-shadow:0 10px 40px rgba(45,74,69,.18)}
+#app::before{content:"";position:absolute;left:40px;top:0;bottom:0;width:2px;background:var(--margin);pointer-events:none}
+.screen{flex:1;display:flex;flex-direction:column;padding:calc(18px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) 54px;position:relative}
+.hand{font-family:'Patrick Hand',cursive;font-weight:400}
+.ic{width:1.05em;height:1.05em;vertical-align:-.17em;display:inline-block;flex:none}.ic.f{fill:currentColor}
+.ic.star-on{color:#e0a100}.ic.star-off{color:#b5c2be}.ic.heart-on{color:#e0475b}.ic.heart-off{color:#c4cecb}
+.ic.flame{color:#e07a1f;fill:#ffc76b}.ic.medal{color:#c98a12}.iconbtn .ic{width:22px;height:22px}
+.say{color:var(--blue)}.say .ic{width:24px;height:24px}.x .ic{width:26px;height:26px;display:block}
+.sheet h3 .ic{width:30px;height:30px;vertical-align:-.2em}.tip .ic{color:var(--ink)}
+
+/* HOME */
+.homehead{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+h1.hand{font-size:31px;line-height:1.05}
+.stats{font-family:'Patrick Hand';font-size:19px;color:var(--ink2);margin-top:4px}
+.iconbtn{display:grid;place-items:center;border:2px solid var(--ink);background:#fff;border-radius:10px;width:40px;height:40px;font-size:18px;cursor:pointer;box-shadow:2px 2px 0 var(--ink);flex:none}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:22px}
+.card{border:0;text-align:left;cursor:pointer;border-radius:14px;padding:16px 12px 12px;min-height:128px;position:relative;
+ box-shadow:2px 3px 0 rgba(0,0,0,.12);transform:rotate(-1.5deg);transition:transform .15s}
+.card:nth-child(even){transform:rotate(1.5deg)}
+.card:focus-visible{transform:rotate(0) scale(1.03);outline:none}
+@media (hover:hover){.card:hover{transform:rotate(0) scale(1.03)}}
+.card .e{line-height:0;color:var(--ink)}.card .e .ic{width:34px;height:34px;stroke-width:1.8}
+.card b{display:block;font-size:16px;line-height:1.15;margin-top:8px}
+.card small{display:block;font-size:13px;color:var(--ink2);line-height:1.15;margin-top:2px}
+.card .stars{margin-top:6px;display:flex;gap:2px}.card .stars .ic{width:17px;height:17px}
+.card.wide{grid-column:1/-1;min-height:auto;display:flex;gap:14px;align-items:center;transform:rotate(-.6deg)}
+.card.wide .e .ic{width:40px;height:40px}
+.card.wide b{margin-top:0;font-size:18px}
+.tape{position:absolute;top:-8px;left:50%;transform:translateX(-50%) rotate(-4deg);width:50px;height:16px;background:rgba(255,255,255,.75);border:1px solid rgba(0,0,0,.04)}
+.y{background:var(--y)}.p{background:var(--p)}.b{background:var(--b)}.g{background:var(--g)}.o{background:var(--o)}.v{background:var(--v)}.w{background:var(--w)}
+.coco{display:flex;gap:10px;align-items:center;margin-top:26px;font-family:'Patrick Hand';font-size:19px;color:var(--ink2);line-height:1.15}
+.coco .coco-svg{width:54px;height:54px;flex:none}
+
+/* SHEET (regola) */
+.sheetbg{position:fixed;inset:0;background:rgba(45,74,69,.45);display:flex;align-items:flex-end;justify-content:center;z-index:10;animation:fade .2s}
+.sheet{width:100%;max-width:480px;max-height:92vh;overflow:auto;border-radius:22px 22px 0 0;padding:22px 20px calc(20px + env(safe-area-inset-bottom));animation:up .25s}
+.sheet h3{font-family:'Patrick Hand';font-size:30px;font-weight:400;line-height:1.05}
+.sheet .sub{color:var(--ink2);font-size:15px;margin-bottom:12px}
+.rule{background:rgba(255,255,255,.7);border-radius:12px;padding:12px 14px;font-size:16px;line-height:1.35;margin-bottom:14px}
+.rule p{margin:4px 0}
+.rule table{border-collapse:collapse;width:100%;margin:6px 0}
+.rule td{padding:3px 6px;border-bottom:1px dashed rgba(45,74,69,.25)}
+.rule td:first-child{color:var(--ink2);width:42%}
+.rule .fr{font-family:'Patrick Hand';font-size:21px;color:var(--blue)}
+.rule .tip{background:var(--y);border-radius:8px;padding:6px 10px;margin-top:8px;font-size:15px}
+.numgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px 8px;font-size:15px}
+.numgrid span b{display:inline-block;width:22px;color:var(--ink2)}
+
+/* LESSON */
+.lhead{display:flex;align-items:center;gap:10px}
+.x{border:0;background:none;font-size:28px;line-height:1;color:var(--ink2);cursor:pointer;margin-left:-44px;width:32px}
+.pbar{flex:1;height:12px;background:#e3e9e6;border-radius:8px;overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--ok);border-radius:8px;transition:width .35s}
+.hearts{white-space:nowrap;display:flex;gap:1px}.hearts .ic{width:20px;height:20px}
+.tag{font-family:'Patrick Hand';font-size:18px;color:var(--ink2);margin-top:12px}
+h2.hand{font-size:29px;line-height:1.05;margin-top:2px}
+.hint{color:var(--ink2);font-size:16px;margin-top:2px}
+.sent{font-family:'Patrick Hand';font-size:33px;color:var(--blue);margin:22px 0 24px;line-height:1.35}
+.slot{display:inline-block;min-width:74px;border-bottom:3px dashed var(--blue);text-align:center;padding:0 6px;line-height:1.1}
+.slot.filled{border-bottom-style:solid}
+.big{font-family:'Patrick Hand';font-size:46px;color:var(--blue);margin:16px 0 20px;line-height:1.1}
+.big.mid{font-size:34px}
+.say{border:0;background:none;cursor:pointer;font-size:22px;vertical-align:middle;margin-left:6px}
+.opts{display:flex;flex-wrap:wrap;gap:12px}
+.opts.grid2{display:grid;grid-template-columns:1fr 1fr}
+.opts.col{display:grid;grid-template-columns:1fr}
+.chip{background:#fff;border:2px solid var(--ink);border-radius:10px;padding:7px 15px;font-weight:800;font-size:20px;color:var(--ink);
+ box-shadow:3px 3px 0 var(--ink);cursor:pointer;transition:transform .08s,box-shadow .08s;text-align:center}
+.chip:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.chip.sel{background:var(--b);border-color:var(--blue);box-shadow:3px 3px 0 var(--blue);color:var(--blue)}
+.chip.ok{background:var(--okbg);border-color:var(--ok);box-shadow:3px 3px 0 var(--ok);color:#1d6640}
+.chip.ko{background:var(--kobg);border-color:var(--ko);box-shadow:3px 3px 0 var(--ko);color:var(--ko)}
+.chip.hide{color:transparent;background:#e6ebe8;border-color:#e6ebe8;box-shadow:none;pointer-events:none}
+.chip.done{opacity:.35;box-shadow:none;pointer-events:none}
+.chip[disabled]{cursor:default}
+.chip.small{font-size:18px;padding:5px 12px}
+.opts.col .chip{text-align:left;font-size:19px}
+.inp{font-family:'Patrick Hand';font-size:30px;color:var(--blue);border:0;border-bottom:3px dashed var(--blue);background:transparent;outline:none;width:100%;padding:2px;border-radius:0}
+.inp:focus{border-bottom-style:solid;background:rgba(207,230,255,.35)}
+.inp.inline{width:96px;text-align:center}
+.inp.ok{color:var(--ok);border-color:var(--ok)}.inp.ko{color:var(--ko);border-color:var(--ko)}
+.lbl{font-weight:800;font-size:16px;margin:14px 0 6px}
+.dateinp{font:600 20px 'Baloo 2';border:2px solid var(--ink);border-radius:10px;padding:6px 10px;background:#fff;color:var(--ink);box-shadow:3px 3px 0 var(--ink)}
+.itdate{font-family:'Patrick Hand';font-size:22px;color:var(--ink2);margin-top:8px;min-height:26px}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+.match .col{display:flex;flex-direction:column;gap:12px}
+.match .chip{width:100%;font-size:19px;padding:10px 6px}
+.ansline{min-height:62px;border-bottom:2px solid var(--ink);display:flex;flex-wrap:wrap;gap:8px;align-content:flex-start;padding:8px 0;margin:8px 0 20px}
+.foot{margin-top:auto;padding-top:20px}
+.fb{display:flex;gap:10px;align-items:flex-start;border-radius:14px;padding:12px 14px;transform:rotate(-1deg);margin-bottom:14px;animation:pop .25s}
+.fb.ok{background:var(--okbg)}.fb.ko{background:var(--kobg)}.fb.al{background:var(--y)}
+.fb .coco-svg{width:48px;height:48px;flex:none;margin-top:-4px}
+.fb .t{font-family:'Patrick Hand';font-size:21px;line-height:1.18}
+.fb .t b{font-family:'Baloo 2';font-size:18px}
+.fb .ex{font-family:'Baloo 2';font-size:15px;margin-top:4px;color:#3d544f;line-height:1.3}
+.btn{width:100%;border:0;background:var(--ink);color:var(--paper);padding:14px;border-radius:12px;font-weight:800;font-size:18px;cursor:pointer;box-shadow:0 4px 0 #1a2e2a;transition:transform .08s}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #1a2e2a}
+.btn:disabled{opacity:.3;cursor:default;transform:none}
+.btn.ok{background:var(--ok);box-shadow:0 4px 0 #1d6640}
+.btn.ko{background:var(--ko);box-shadow:0 4px 0 #7d1f33}
+.btn.ghost{background:transparent;color:var(--ink);box-shadow:none;border:2px solid var(--ink);margin-top:10px}
+.shake{animation:shake .35s}
+
+/* RESULT */
+.res{text-align:center;align-items:center;justify-content:center}
+.res .coco-svg{width:120px;height:120px;margin-bottom:6px}
+.res h2{font-family:'Patrick Hand';font-size:44px;font-weight:400;line-height:1}
+.res .starsbig{margin:10px 0;display:flex;gap:8px;justify-content:center}.res .starsbig .ic{width:48px;height:48px;stroke-width:1.6}
+.res .note{background:var(--y);border-radius:14px;padding:12px 16px;margin:14px 0 24px;font-family:'Patrick Hand';font-size:21px;transform:rotate(-1deg);line-height:1.2}
+.res .btns{width:100%}
+.confetti{position:fixed;top:-40px;width:10px;height:16px;border-radius:3px;pointer-events:none;animation:fall linear forwards;z-index:20}
+
+/* ===== ELEMENTI COMUNI AI LAYOUT ===== */
+.homeside{display:contents}.homehead{order:1}.grid{order:2}.coco{order:3}.homeprog{display:none;order:4}
+.sign{order:5;align-self:flex-end;font-family:'Patrick Hand',cursive;font-size:24px;color:var(--blue);margin-top:18px;transform:rotate(-3deg);padding:0 6px 2px;border-bottom:2px solid var(--blue);border-radius:0 0 40% 10%}
+.homeprog .pbar{height:12px;margin:6px 0}.homeprog span{font-family:'Patrick Hand';font-size:19px;color:var(--ink2)}
+.lmain{flex:1;display:flex;flex-direction:column;width:100%}
+.lside{display:none}
+.kbd{display:none}
+.sidecard{border-radius:14px;padding:20px 16px 16px;position:relative;box-shadow:2px 3px 0 rgba(0,0,0,.12);transform:rotate(1deg)}
+.sidehead{display:flex;gap:10px;align-items:center}.sidehead .coco-svg{width:58px;height:58px;flex:none}
+.sidehead b{display:block;font-size:18px;line-height:1.15}.sidehead small{color:var(--ink2);font-size:14px}
+.sidecard .btn.ghost{margin-top:14px;font-size:16px;padding:10px;display:flex;gap:6px;align-items:center;justify-content:center}
+.sidecard .rule{margin:12px 0 0;font-size:15px}.sidecard .numgrid{grid-template-columns:1fr 1fr;font-size:15px}.numgrid span{white-space:nowrap}
+.keys{margin-top:20px;color:var(--ink2);font-size:14px;line-height:1.4}
+
+/* ===== TABLET (iPad e simili) ===== */
+@media (min-width:700px) and (min-height:520px){
+  body{padding:24px}
+  #app{max-width:900px;min-height:calc(100vh - 48px);min-height:calc(100dvh - 48px);border-radius:22px;overflow:hidden}
+  #app::before{left:66px}
+  .screen{padding:calc(34px + env(safe-area-inset-top)) 44px calc(34px + env(safe-area-inset-bottom)) 100px}
+  .x{margin-left:-76px;width:40px}.x .ic{width:30px;height:30px}
+  .sign{font-size:28px}
+  h1.hand{font-size:44px}.stats{font-size:23px}
+  .iconbtn{width:48px;height:48px}.iconbtn .ic{width:26px;height:26px}
+  .grid{grid-template-columns:repeat(3,1fr);gap:24px;margin-top:28px}
+  .card{min-height:158px;padding:22px 16px 16px}
+  .card .e .ic{width:42px;height:42px}.card.wide .e .ic{width:48px;height:48px}
+  .card b{font-size:20px}.card small{font-size:15px}.card .stars .ic{width:20px;height:20px}
+  .coco{font-size:23px}.coco .coco-svg{width:66px;height:66px}
+  .lmain{max-width:700px;margin:0 auto}
+  .tag{font-size:21px}h2.hand{font-size:38px}.hint{font-size:19px}
+  .sent{font-size:44px;margin:30px 0 32px}.slot{min-width:100px}
+  .big{font-size:64px}.big.mid{font-size:46px}
+  .opts{gap:16px}
+  .chip{font-size:25px;padding:10px 22px;border-radius:12px}.chip.small{font-size:22px;padding:7px 16px}
+  .opts.col .chip{font-size:23px;padding:12px 20px}
+  .match{gap:16px}.match .col{gap:16px}.match .chip{font-size:23px;padding:14px 8px}
+  .inp{font-size:38px}.inp.inline{width:130px}
+  .lbl{font-size:18px}.dateinp{font-size:22px}
+  .hearts .ic{width:26px;height:26px}.pbar{height:16px}
+  .fb{padding:16px 18px}.fb .coco-svg{width:60px;height:60px}.fb .t{font-size:26px}.fb .t b{font-size:21px}.fb .ex{font-size:17px}
+  .btn{font-size:21px;padding:17px;border-radius:14px}
+  .res .coco-svg{width:160px;height:160px}.res h2{font-size:58px}
+  .res .starsbig .ic{width:60px;height:60px}
+  .res .note{font-size:25px;max-width:520px}.res .btns{max-width:460px}
+  .sheetbg{align-items:center;padding:24px}
+  .sheet{max-width:620px;border-radius:22px;padding:30px}
+  .sheet h3{font-size:38px}.rule{font-size:18px}.rule .fr{font-size:24px}.numgrid{font-size:17px}
+}
+
+/* ===== COMPUTER (e iPad in orizzontale) ===== */
+@media (min-width:1024px) and (min-height:600px){
+  #app{max-width:1220px}
+  .screen.home{display:grid;grid-template-columns:300px 1fr;gap:44px;align-items:start}
+  .homeside{display:flex;flex-direction:column;gap:22px;position:sticky;top:34px}
+  .homeprog{display:block}
+  .sign{align-self:flex-start;margin-top:6px}
+  .coco{margin-top:0}
+  .grid{grid-template-columns:repeat(4,1fr);margin-top:8px}
+  .card[data-id="date"]{grid-column:span 2}
+  .screen.lesson{flex-direction:row;gap:56px;align-items:stretch}
+  .lmain{max-width:none;margin:0}
+  .lside{display:block;width:310px;flex:none;padding-top:46px}
+  .opts.col{grid-template-columns:1fr 1fr}
+}
+@media (min-width:1024px) and (min-height:600px) and (hover:hover){
+  .kbd{display:inline-grid;place-items:center;width:22px;height:22px;border:1.5px solid currentColor;border-radius:6px;font-size:13px;margin-right:10px;opacity:.45;vertical-align:3px;font-weight:600}
+  .chip:not(.sel):not(.ok):not(.ko):not(.hide):hover{background:#f4f8ff}
+}
+@keyframes pop{from{transform:scale(.9) rotate(-1deg);opacity:0}to{transform:scale(1) rotate(-1deg);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes fade{from{opacity:0}}
+@keyframes up{from{transform:translateY(40px);opacity:0}}
+@keyframes fall{to{transform:translateY(110vh) rotate(540deg)}}
+@media (max-width:360px){.screen{padding-left:48px}#app::before{left:36px}.x{margin-left:-40px}.grid{gap:12px}.sent{font-size:29px}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ============ UTILITÀ ============ */
+const app = document.getElementById('app');
+const rand = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const sample = (a, n) => shuffle(a).slice(0, n);
+const norm = s => s.toLowerCase().replace(/[’`´]/g, "'").replace(/[-‐–]/g, ' ').replace(/[.!?,;:]/g, ' ').replace(/\s+/g, ' ').trim().replace(/' /g, "'");
+const plain = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '');
+function grade(input, answers) {
+  let n = norm(input);
+  const p = plain(n);
+  if (p.startsWith('je suis nee ')) n = n.slice(12); else if (p.startsWith('je suis ne ')) n = n.slice(11);
+  for (const a of answers) if (n === norm(a)) return 'ok';
+  for (const a of answers) if (plain(n) === plain(norm(a))) return 'al';
+  return 'ko';
+}
+const phrase = (art, w) => art.endsWith("'") ? art + w : art + ' ' + w;
+
+/* ============ ICONE VETTORIALI ============ */
+const ICONS = {
+  book: '<path d="M2 5.5c3.5-1.3 7-1 10 1v13.5c-3-2-6.5-2.3-10-1z"/><path d="M22 5.5c-3.5-1.3-7-1-10 1v13.5c3-2 6.5-2.3 10-1z"/>',
+  pencil: '<path d="M4 20l1-5L16 4l4 4L9 19z"/><path d="M14 6l4 4"/>',
+  numbers: '<rect x="3" y="4" width="18" height="16" rx="3"/><path d="M7 9.5 9 8v8"/><path d="M12.5 9.5a2 2 0 0 1 3.5 1c0 1.5-3.5 3.5-3.5 5.5h4"/>',
+  calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 14h2M14 14h2M8 17h2"/>',
+  person: '<circle cx="12" cy="7" r="3.5"/><path d="M5 21c0-4 3-7 7-7s7 3 7 7"/>',
+  backpack: '<path d="M6 10a6 6 0 0 1 12 0v9a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2z"/><path d="M9 4.5V4a3 3 0 0 1 6 0v.5"/><path d="M9 14h6v4H9z"/>',
+  cake: '<path d="M4 21h16M5 21v-7h14v7"/><path d="M5 17c2 1.5 4 1.5 7 0s5-1.5 7 0"/><path d="M12 14v-4"/><path d="M12 6.5c-1 1-1 2.5 0 2.5s1-1.5 0-2.5z"/>',
+  clipboard: '<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 3h6v3H9z"/><path d="M9 11l1.5 1.5L13 10M9 16h6"/>',
+  flame: '<path d="M12 21c-4 0-6-3-6-6 0-4 3-6 4-10 2 2 3 4 3 6 1-1 2-2 2-3 2 2 3 4 3 7 0 3-2 6-6 6z"/>',
+  star: '<path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.8l-5.4 2.9 1.1-6.1-4.5-4.2 6.1-.8z"/>',
+  medal: '<circle cx="12" cy="15" r="5"/><path d="M8 3l3 7M16 3l-3 7"/>',
+  soundOn: '<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/>',
+  soundOff: '<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M17 9l5 6M22 9l-5 6"/>',
+  heart: '<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',
+  warn: '<path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.01"/>',
+  bulb: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+  close: '<path d="M6 6l12 12M18 6L6 18"/>',
+  keyboard: '<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/>'
+};
+const ic = (name, cls = '') => `<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
+/* Coco, il gallo mascotte */
+const coco = sleep => `<svg class="coco-svg" viewBox="0 0 64 64" aria-hidden="true">
+<g stroke="#2d4a45" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+<path d="M21 34C12 32 7 24 9 14c4 7 9 11 15 14z" fill="#1d3a8a"/>
+<path d="M20 39C11 40 5 34 4 26c5 4 10 6 17 6z" fill="#ef3340"/>
+<path d="M22 31C17 24 17 15 22 9c1 8 4 13 8 17z" fill="#fff"/>
+<path d="M30 51v6M37 51v6M27 57h6M34 57h6" stroke="#e8890c" stroke-width="2.5" fill="none"/>
+<path d="M24 50C14 47 13 35 19 30c4-3 11-2 15-4 3-2 1-8 3-12 2-5 10-6 13-1 2 3 1 7-1 10-2 4 2 8 2 14 0 9-8 14-16 14-4 0-7 0-10-1z" fill="#fff"/>
+<path d="M38 11c-1-4 2-6 4-4 0-3 4-4 5-1 2-2 5 0 4 3z" fill="#ef3340"/>
+<path d="M49.5 14.5l6 2.5-6 2.5z" fill="#f5a524"/>
+<path d="M48 21c2.5 1 2.5 5.5-.5 5.5S45 22.5 48 21z" fill="#ef3340"/>
+<path d="M25 40c5-4 11-3 14 1-3 4-9 5-14 2z" fill="#cfe6ff"/>
+${sleep ? '<path d="M42.3 15.3q1.7 1.4 3.4 0" fill="none"/>' : '<circle cx="44" cy="15" r="1.8" fill="#2d4a45" stroke="none"/>'}
+</g>${sleep ? '<g fill="#6f8581" font-family="Patrick Hand,cursive"><text x="52" y="10" font-size="11">z</text><text x="58" y="4" font-size="8">z</text></g>' : ''}</svg>`;
+
+/* ============ SALVATAGGIO ============ */
+const KEY = 'carnet-fr-v1';
+let S = { stars: {}, xp: 0, streak: 0, last: null, sound: true };
+try { const r = localStorage.getItem(KEY); if (r) S = Object.assign(S, JSON.parse(r)); } catch (e) {}
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} };
+const dayKey = d => d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+const todayK = () => dayKey(new Date());
+const yestK = () => dayKey(new Date(Date.now() - 864e5));
+const streakNow = () => (S.last === todayK() || S.last === yestK()) ? S.streak : 0;
+function bumpStreak() { const t = todayK(); if (S.last === t) return; S.streak = S.last === yestK() ? S.streak + 1 : 1; S.last = t; }
+
+/* ============ SUONI E VOCE (compatibile con iPhone/iPad) ============ */
+let AC = null, FR_VOICE = null, speechUnlocked = false;
+const hasTTS = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+function pickVoice() {
+  if (!hasTTS) return;
+  try {
+    const vs = speechSynthesis.getVoices();
+    FR_VOICE = vs.find(v => /^fr[-_]FR/i.test(v.lang) && /Amélie|Amelie|Thomas|Audrey|Marie|Google/i.test(v.name))
+      || vs.find(v => /^fr[-_]FR/i.test(v.lang)) || vs.find(v => /^fr/i.test(v.lang)) || null;
+  } catch (e) {}
+}
+if (hasTTS) { pickVoice(); try { speechSynthesis.addEventListener('voiceschanged', pickVoice); } catch (e) { speechSynthesis.onvoiceschanged = pickVoice; } }
+function getAC() {
+  try { AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state !== 'running') AC.resume(); } catch (e) {}
+  return AC;
+}
+/* iOS sblocca l'audio solo dentro un gesto dell'utente (tocco/clic): lo facciamo al primo tocco */
+function unlockAudio() {
+  try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {} // suona anche con il silenzioso (iOS 17+)
+  const ac = getAC();
+  try { if (ac) { const b = ac.createBuffer(1, 1, 22050), src = ac.createBufferSource(); src.buffer = b; src.connect(ac.destination); src.start(0); } } catch (e) {}
+  if (hasTTS && !speechUnlocked) {
+    try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; u.lang = 'fr-FR'; speechSynthesis.speak(u); speechUnlocked = true; } catch (e) {}
+  }
+}
+['touchend', 'click', 'keydown'].forEach(ev => document.addEventListener(ev, () => {
+  if (!speechUnlocked || !AC || AC.state !== 'running') unlockAudio();
+}, { capture: true, passive: true }));
+document.addEventListener('visibilitychange', () => { if (!document.hidden && AC && AC.state !== 'running') AC.resume(); });
+function beep(ok) {
+  if (!S.sound) return;
+  const ac = getAC(); if (!ac) return;
+  try {
+    const t = ac.currentTime + .01, notes = ok ? [660, 990] : [280, 200];
+    notes.forEach((f, i) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = ok ? 'sine' : 'triangle'; o.frequency.value = f;
+      const st = t + i * .12;
+      g.gain.setValueAtTime(.0001, st); g.gain.exponentialRampToValueAtTime(.22, st + .02); g.gain.exponentialRampToValueAtTime(.0001, st + .2);
+      o.connect(g); g.connect(ac.destination); o.start(st); o.stop(st + .22);
+    });
+  } catch (e) {}
+}
+function speak(t) {
+  if (!S.sound || !t || !hasTTS) return;
+  try {
+    if (!FR_VOICE) pickVoice();
+    const u = new SpeechSynthesisUtterance(t);
+    u.lang = 'fr-FR'; if (FR_VOICE) u.voice = FR_VOICE; u.rate = .9;
+    const ss = window.speechSynthesis;
+    if (ss.speaking || ss.pending) { ss.cancel(); setTimeout(() => { ss.speak(u); ss.resume(); }, 90); }
+    else { ss.speak(u); ss.resume(); }
+  } catch (e) {}
+}
+
+/* ============ DATI (parole diverse dalla verifica) ============ */
+// [parola, italiano, genere m/f/p, inizia per vocale/h muta, nota]
+const NOUNS = [
+  ['fenêtre','finestra','f'], ['chaise','sedia','f'], ['crayon','matita','m'], ['ordinateur','computer','m',1],
+  ['règles','righelli','p'], ['sac','zaino','m'], ['carte','cartina geografica','f'], ['agenda','diario','m',1],
+  ['feutres','pennarelli','p'], ['dictionnaire','dizionario','m'], ['calculatrice','calcolatrice','f'], ['école','scuola','f',1],
+  ['ciseaux','forbici','p'], ['classeur','raccoglitore','m'], ['horloge','orologio da muro','f',1,'in italiano è maschile, in francese è femminile!'],
+  ['cartable','cartella','m',0,'in italiano è femminile, in francese è maschile!'], ['amie','amica','f',1], ['copains','compagni','p'],
+  ['étagère','scaffale','f',1,'in italiano è maschile, in francese è femminile!'], ['banc','banco','m'], ['lampe','lampada','f'],
+  ['histoire','storia','f',1,'la «h» non si pronuncia (h muta).'], ['arbre','albero','m',1], ['cantine','mensa','f'],
+  ['gymnase','palestra','m',0,'in italiano è femminile, in francese è maschile!'], ['bibliothèque','biblioteca','f'],
+  ['enfants','bambini','p'], ['affiches','cartelloni','p'], ['dessin','disegno','m'], ['ami','amico','m',1],
+  ['exercices','esercizi','p'], ['photo','foto','f'], ['ballon','pallone','m'], ['image','immagine','f',1]
+];
+const defArt = n => n[2] === 'p' ? 'les' : n[3] ? "l'" : n[2] === 'm' ? 'le' : 'la';
+const indArt = n => n[2] === 'p' ? 'des' : n[2] === 'm' ? 'un' : 'une';
+const gname = n => n[2] === 'p' ? 'plurale' : n[2] === 'm' ? 'maschile singolare' : 'femminile singolare';
+const note = n => n[4] ? `<br>${ic('warn')} «${n[0]}»: ${n[4]}` : '';
+function whyDef(n) {
+  if (n[2] === 'p') return `«${n[0]}» è plurale → <b>les</b> (sempre, anche davanti a vocale).` + note(n);
+  if (n[3]) return `«${n[0]}» comincia per vocale o h muta → <b>l'</b>.` + note(n);
+  return `«${n[0]}» è ${gname(n)} → <b>${defArt(n)}</b>.` + note(n);
+}
+const whyInd = n => `«${n[0]}» è ${gname(n)} → <b>${indArt(n)}</b>.` + note(n);
+
+const NUM = ['zéro','un','deux','trois','quatre','cinq','six','sept','huit','neuf','dix','onze','douze','treize','quatorze','quinze','seize',
+  'dix-sept','dix-huit','dix-neuf','vingt','vingt-et-un','vingt-deux','vingt-trois','vingt-quatre','vingt-cinq','vingt-six','vingt-sept',
+  'vingt-huit','vingt-neuf','trente','trente-et-un'];
+const IN_TEST = [8, 13, 14, 19, 21, 25, 27];
+const POOL = [...Array(31).keys()].filter(x => !IN_TEST.includes(x));
+const numAns = n => n === 21 || n === 31 ? [NUM[n], NUM[n].replace(/-et-/, '-')] : [NUM[n]];
+
+const DAYS = [['lunedì','lundi'],['martedì','mardi'],['mercoledì','mercredi'],['giovedì','jeudi'],['venerdì','vendredi'],['sabato','samedi'],['domenica','dimanche']];
+const MONTHS = [['gennaio','janvier'],['febbraio','février'],['marzo','mars'],['aprile','avril'],['maggio','mai'],['giugno','juin'],
+  ['luglio','juillet'],['agosto','août'],['settembre','septembre'],['ottobre','octobre'],['novembre','novembre'],['dicembre','décembre']];
+const CONTEXT = [['Il mese di Natale','décembre'],["Il primo mese dell'anno",'janvier'],['Il mese di Ferragosto','août'],['Il mese più corto','février'],
+  ['Il mese in cui ricomincia la scuola','septembre'],['Il mese di Halloween','octobre'],['Il primo giorno della settimana','lundi'],
+  ['Il giorno dopo il sabato','dimanche'],["L'ultimo mese dell'anno",'décembre'],['Il mese della festa della mamma','mai']];
+
+const ETRE = { 'je':'suis','tu':'es','il':'est','elle':'est','nous':'sommes','vous':'êtes','ils':'sont','elles':'sont' };
+const AVOIR = { "j'":'ai','tu':'as','il':'a','elle':'a','nous':'avons','vous':'avez','ils':'ont','elles':'ont' };
+const ETRE_S = [
+  ['Je','content.','Io sono contento.'], ['Je','à la maison.','Io sono a casa.'], ['Tu','français ?','Tu sei francese?'],
+  ['Tu','sympa.','Tu sei simpatico.'], ['Il','grand.','Lui è alto.'], ['Il','allemand.','Lui è tedesco.'],
+  ['Elle','brune.','Lei è mora.'], ['Elle','petite.','Lei è piccola.'], ['Nous','en classe.','Noi siamo in classe.'],
+  ['Nous','amis.','Noi siamo amici.'], ['Vous','portugais ?','Voi siete portoghesi?'], ['Vous','en retard.','Voi siete in ritardo.'],
+  ['Ils','au parc.','Loro sono al parco.'], ['Ils','suisses.','Loro sono svizzeri.'], ['Elles','américaines ?','Loro sono americane?'],
+  ['Elles','sœurs.','Loro sono sorelle.']
+];
+const AVOIR_S = [
+  ["J'",'un vélo.','Io ho una bici.'], ["J'",'onze ans.','Io ho undici anni.'], ['Tu','une sœur ?','Tu hai una sorella?'],
+  ['Tu','un ordinateur ?','Tu hai un computer?'], ['Il','un chien.','Lui ha un cane.'], ['Il','les yeux bleus.','Lui ha gli occhi azzurri.'],
+  ['Elle','douze ans.','Lei ha dodici anni.'], ['Elle','une robe rose.','Lei ha un vestito rosa.'], ['Nous','un jardin.','Noi abbiamo un giardino.'],
+  ['Nous',"français aujourd'hui.",'Noi abbiamo francese oggi.'], ['Vous','une règle ?','Voi avete un righello?'],
+  ['Vous','une voiture ?','Voi avete una macchina?'], ['Ils','trois poissons.','Loro hanno tre pesci.'], ['Ils','un ballon.','Loro hanno un pallone.'],
+  ['Elles','un perroquet.','Loro hanno un pappagallo.'], ['Elles','des crayons.','Loro hanno delle matite.']
+];
+const ETRE_T = [['je','suis'],['tu','es'],['il / elle','est'],['nous','sommes'],['vous','êtes'],['ils / elles','sont']];
+const AVOIR_T = [["j'",'ai'],['tu','as'],['il / elle','a'],['nous','avons'],['vous','avez'],['ils / elles','ont']];
+
+const dayWord = d => d === 1 ? 'premier' : NUM[d];
+const yearWord = y => 'deux mille' + (y > 2000 ? ' ' + NUM[y - 2000] : '');
+const dateFr = (d, m, y) => `le ${dayWord(d)} ${MONTHS[m][1]}` + (y ? ' ' + yearWord(y) : '');
+const dateIt = (d, m, y) => `${d === 1 ? '1°' : d} ${MONTHS[m][0]}` + (y ? ' ' + y : '');
+const dateAns = (d, m, y) => { const a = [dateFr(d, m, y)]; if (d === 1) a.push(`le 1er ${MONTHS[m][1]}` + (y ? ' ' + yearWord(y) : '')); return a; };
+
+/* ============ GENERATORI DI ESERCIZI ============ */
+function genDef() {
+  return sample(NOUNS, 8).map((n, i) => {
+    const base = { tag: 'Articoli determinativi', hint: `(${n[1]})`, after: n[0], explain: whyDef(n), say: phrase(defArt(n), n[0]) };
+    return i % 3 === 2
+      ? { ...base, kind: 'type', title: "Scrivi l'articolo determinativo", answers: [defArt(n)] }
+      : { ...base, kind: 'choice', title: "Scegli l'articolo giusto", options: ['le', 'la', "l'", 'les'], answer: defArt(n), layout: 'grid2' };
+  });
+}
+function genInd() {
+  return sample(NOUNS, 8).map((n, i) => {
+    const base = { tag: 'Articoli indeterminativi', hint: `(${n[1]})`, after: n[0], explain: whyInd(n), say: phrase(indArt(n), n[0]) };
+    return i % 3 === 2
+      ? { ...base, kind: 'type', title: "Scrivi l'articolo indeterminativo", answers: [indArt(n)] }
+      : { ...base, kind: 'choice', title: "Scegli l'articolo giusto", options: ['un', 'une', 'des'], answer: indArt(n), layout: 'grid2' };
+  });
+}
+function nearNums(n) {
+  const c = shuffle(POOL.filter(x => x !== n && Math.abs(x - n) <= 9)).slice(0, 3);
+  return shuffle([n, ...c]);
+}
+function genNum() {
+  const tag = 'I numeri 0–30';
+  const ns = sample(POOL, 6);
+  const matchQ = () => ({ kind: 'match', tag, title: 'Abbina le coppie', pairs: sample(POOL, 5).map(x => [String(x), NUM[x]]) });
+  const toWord = n => {
+    let opts = nearNums(n).map(x => NUM[x]);
+    if (n >= 11 && n <= 16) opts[opts.indexOf(NUM[n]) === 0 ? 1 : 0] = 'dix-' + NUM[n - 10];
+    return { kind: 'choice', tag, title: 'Come si scrive questo numero?', prompt: String(n), options: shuffle(opts), answer: NUM[n], layout: 'col',
+      explain: n >= 11 && n <= 16 ? `Da 11 a 16 i numeri hanno un nome proprio: ${n} = <b>${NUM[n]}</b>.` : `${n} = <b>${NUM[n]}</b>`, say: NUM[n] };
+  };
+  const toDigit = n => ({ kind: 'choice', tag, title: 'Quale numero è?', prompt: NUM[n], promptSay: NUM[n], options: nearNums(n).map(String), answer: String(n), layout: 'grid2',
+    explain: `«${NUM[n]}» = <b>${n}</b>`, say: NUM[n] });
+  const typeQ = n => ({ kind: 'type', tag, title: 'Scrivi il numero in lettere', prompt: String(n), answers: numAns(n), placeholder: 'in francese…',
+    explain: `${n} si scrive <b>${NUM[n]}</b>` + (n > 20 && n < 30 ? ' (con il trattino!)' : ''), say: NUM[n] });
+  const calc = () => {
+    const c = rand(POOL.filter(x => x >= 4)), a = 1 + Math.floor(Math.random() * (c - 1)), b = c - a;
+    return { kind: 'choice', tag, title: 'Quanto fa?', prompt: `${NUM[a]} + ${NUM[b]}`, mid: true, options: nearNums(c).map(x => NUM[x]), answer: NUM[c], layout: 'col',
+      explain: `${a} + ${b} = ${c} → <b>${NUM[c]}</b>`, say: `${NUM[a]} plus ${NUM[b]} égale ${NUM[c]}` };
+  };
+  return [matchQ(), toWord(ns[0]), toDigit(ns[1]), typeQ(ns[2]), matchQ(), calc(), toWord(ns[3]), typeQ(ns[4])];
+}
+function genDays() {
+  const tag = 'Giorni e mesi', ALL = [...DAYS, ...MONTHS];
+  const typeQ = w => ({ kind: 'type', tag, title: 'Traduci in francese', prompt: w[0], mid: true, answers: [w[1]], placeholder: 'in francese…',
+    explain: `«${w[0]}» = <b>${w[1]}</b>. In francese giorni e mesi si scrivono con la lettera minuscola.`, say: w[1] });
+  const tw = sample(ALL, 3);
+  const di = Math.floor(Math.random() * 7), mi = Math.floor(Math.random() * 12);
+  const after = { kind: 'choice', tag, title: 'Quale giorno viene dopo?', prompt: DAYS[di][1], mid: true, promptSay: DAYS[di][1],
+    options: shuffle([DAYS[(di + 1) % 7][1], ...sample(DAYS.filter((_, k) => k !== (di + 1) % 7 && k !== di), 3).map(d => d[1])]),
+    answer: DAYS[(di + 1) % 7][1], layout: 'grid2', explain: `Dopo ${DAYS[di][1]} viene <b>${DAYS[(di + 1) % 7][1]}</b>.`, say: `${DAYS[di][1]}, ${DAYS[(di + 1) % 7][1]}` };
+  const pm = (mi + 11) % 12;
+  const before = { kind: 'choice', tag, title: 'Quale mese viene prima?', prompt: MONTHS[mi][1], mid: true, promptSay: MONTHS[mi][1],
+    options: shuffle([MONTHS[pm][1], ...sample(MONTHS.filter((_, k) => k !== pm && k !== mi), 3).map(m => m[1])]),
+    answer: MONTHS[pm][1], layout: 'grid2', explain: `Prima di ${MONTHS[mi][1]} viene <b>${MONTHS[pm][1]}</b>.`, say: `${MONTHS[pm][1]}, ${MONTHS[mi][1]}` };
+  const cx = rand(CONTEXT);
+  const pool = cx[1] === 'lundi' || cx[1] === 'dimanche' ? DAYS : MONTHS;
+  const ctx = { kind: 'choice', tag, title: 'Indovina!', prompt: cx[0], mid: true,
+    options: shuffle([cx[1], ...sample(pool.filter(x => x[1] !== cx[1]), 3).map(x => x[1])]), answer: cx[1], layout: 'grid2',
+    explain: `${cx[0]}: <b>${cx[1]}</b>`, say: cx[1] };
+  const match = { kind: 'match', tag, title: 'Abbina le coppie', pairs: sample(ALL, 5) };
+  return [typeQ(tw[0]), after, match, typeQ(tw[1]), before, ctx, typeQ(tw[2]), typeQ(rand(ALL.filter(w => !tw.includes(w))))];
+}
+function genVerb(name, MAP, SENT, TABLE, extra) {
+  const tag = 'Il verbo ' + name;
+  const forms = [...new Set(Object.values(MAP))];
+  const ss = sample(SENT, 7);
+  const info = s => {
+    const f = MAP[s[0].toLowerCase()];
+    const full = (s[0].endsWith("'") ? s[0] + f : s[0] + ' ' + f) + ' ' + s[1];
+    return { f, full, explain: `«${s[0]}» va con «<b>${f}</b>»: ${full}`, hint: s[2] };
+  };
+  const choice = s => { const i = info(s); return { kind: 'choice', tag, title: `Completa con il verbo ${name}`, hint: i.hint, before: s[0], after: s[1],
+    options: shuffle(forms), answer: i.f, explain: i.explain, say: i.full }; };
+  const type = s => { const i = info(s); return { kind: 'type', tag, title: `Scrivi il verbo ${name}`, hint: i.hint, before: s[0], after: s[1],
+    answers: [i.f], explain: i.explain, say: i.full }; };
+  const os = rand(SENT.filter(s => !s[1].includes('?')));
+  const oi = info(os);
+  const order = { kind: 'order', tag, title: 'Riordina la frase', hint: os[2], answer: oi.full.split(' '),
+    tiles: shuffle([...oi.full.split(' '), ...sample(forms.filter(f => f !== oi.f && !oi.full.split(' ').includes(f)), 2)]), explain: oi.explain, say: oi.full };
+  const match = { kind: 'match', tag, title: 'Abbina pronome e verbo', pairs: TABLE.map(r => [...r]) };
+  const qs = [choice(ss[0]), choice(ss[1]), type(ss[2]), match, choice(ss[3]), order, type(ss[4]), choice(ss[5])];
+  if (extra) qs.splice(5, 0, extra(tag));
+  return qs;
+}
+const genEtre = () => genVerb('être', ETRE, ETRE_S, ETRE_T);
+const genAvoir = () => genVerb('avoir', AVOIR, AVOIR_S, AVOIR_T, tag => ({ kind: 'choice', tag, title: 'Come si scrive?', prompt: 'je + ai', mid: true,
+  options: shuffle(["j'ai", 'je ai', "j'as", 'je a']), answer: "j'ai", layout: 'grid2',
+  explain: "Davanti a vocale «je» perde la «e» e prende l'apostrofo: <b>j'ai</b>.", say: "j'ai" }));
+function rDate() { return [2 + Math.floor(Math.random() * 27), Math.floor(Math.random() * 12), 2011 + Math.floor(Math.random() * 6)]; }
+function genDate() {
+  const tag = 'La data';
+  const m1 = Math.floor(Math.random() * 12), M = MONTHS[m1][1];
+  const prem = { kind: 'choice', tag, title: 'Come si dice?', prompt: `1° ${MONTHS[m1][0]}`, mid: true, layout: 'col',
+    options: shuffle([`le premier ${M}`, `le un ${M}`, `la première ${M}`, `le premier de ${M}`]), answer: `le premier ${M}`,
+    explain: `Il giorno 1 si dice <b>premier</b>: le premier ${M}. Gli altri giorni si dicono con il numero normale.`, say: `le premier ${M}` };
+  const y = 2011 + Math.floor(Math.random() * 6), yn = y - 2000;
+  const year = { kind: 'choice', tag, title: 'Come si dice questo anno?', prompt: String(y), layout: 'col',
+    options: shuffle([yearWord(y), `deux cent ${NUM[yn]}`, `deux mille ${NUM[yn % 10]}`, `vingt ${NUM[yn]}`]), answer: yearWord(y),
+    explain: `${y} = <b>${yearWord(y)}</b> (duemila + ${yn}).`, say: yearWord(y) };
+  const orderQ = () => {
+    const [d, m, yy] = rDate(), ans = dateFr(d, m, yy).split(' ');
+    const extra = sample(['la', 'de', 'un', MONTHS[(m + 3) % 12][1], 'cent'].filter(t => !ans.includes(t)), 2);
+    return { kind: 'order', tag, title: 'Scrivi la data in francese', prompt: dateIt(d, m, yy), mid: true, answer: ans, tiles: shuffle([...ans, ...extra]),
+      explain: `${dateIt(d, m, yy)} = <b>${dateFr(d, m, yy)}</b>`, say: dateFr(d, m, yy) };
+  };
+  const typeQ = () => {
+    const [d, m] = rDate();
+    return { kind: 'type', tag, title: 'Scrivi la data in francese', prompt: dateIt(d, m), mid: true, answers: dateAns(d, m), placeholder: 'le …',
+      explain: `${dateIt(d, m)} = <b>${dateFr(d, m)}</b> (ricorda «le» davanti!)`, say: dateFr(d, m) };
+  };
+  const kid = rand([['Marco', 'm'], ['Sofia', 'f'], ['Luca', 'm'], ['Giulia', 'f'], ['Matteo', 'm'], ['Emma', 'f'], ['Leo', 'm'], ['Alice', 'f']]);
+  const [d2, m2, y2] = rDate();
+  const ne = { kind: 'choice', tag, title: `Parla ${kid[0]}. Completa!`, hint: `(Sono nat${kid[1] === 'm' ? 'o' : 'a'} il ${dateIt(d2, m2, y2)})`,
+    before: 'Je suis', after: dateFr(d2, m2, y2) + '.', options: ['né', 'née'], answer: kid[1] === 'm' ? 'né' : 'née', layout: 'grid2',
+    explain: 'Maschio → <b>je suis né</b>; femmina → <b>je suis née</b> (con due «e»).', say: `Je suis ${kid[1] === 'm' ? 'né' : 'née'} ${dateFr(d2, m2, y2)}` };
+  return [prem, typeQ(), year, orderQ(), ne, typeQ(), orderQ(), { kind: 'mydate', tag, title: 'Ora tocca a te!' }];
+}
+function genBlanc() {
+  const gens = [genDef, genInd, genNum, genDays, genEtre, genAvoir, genDate];
+  return shuffle(gens.flatMap(g => sample(g().filter(q => q.kind !== 'mydate' && q.kind !== 'match'), 2)));
+}
+
+/* ============ SEZIONI E REGOLE ============ */
+const SECTIONS = [
+  { id: 'def', title: "Le, la, l', les", sub: 'Articoli determinativi', emoji: 'book', color: 'y', gen: genDef, rule: `
+    <table><tr><td>maschile singolare</td><td class="fr">le crayon</td></tr>
+    <tr><td>femminile singolare</td><td class="fr">la chaise</td></tr>
+    <tr><td>davanti a vocale o h muta</td><td class="fr">l'école, l'histoire</td></tr>
+    <tr><td>plurale (m e f)</td><td class="fr">les feutres, les enfants</td></tr></table>
+    <div class="tip">${ic('warn')} Il genere non è sempre uguale all'italiano: <b>la</b> cartella → <b>le</b> cartable.</div>` },
+  { id: 'ind', title: 'Un, une, des', sub: 'Articoli indeterminativi', emoji: 'pencil', color: 'p', gen: genInd, rule: `
+    <table><tr><td>maschile singolare</td><td class="fr">un sac</td></tr>
+    <tr><td>femminile singolare</td><td class="fr">une lampe</td></tr>
+    <tr><td>plurale (m e f)</td><td class="fr">des ciseaux, des affiches</td></tr></table>
+    <div class="tip">${ic('bulb')} Davanti a vocale non cambia nulla: <b>un</b> ami, <b>une</b> amie.</div>` },
+  { id: 'num', title: 'I numeri 0–30', sub: 'Les nombres', emoji: 'numbers', color: 'b', gen: genNum, rule: `
+    <div class="numgrid">${NUM.slice(0, 31).map((w, i) => `<span><b>${i}</b>${w}</span>`).join('')}</div>
+    <div class="tip">${ic('bulb')} 17, 18, 19 = dix-<b>sept</b>, dix-<b>huit</b>, dix-<b>neuf</b>. 21 = vingt-<b>et</b>-un, poi vingt-deux, vingt-trois…</div>` },
+  { id: 'days', title: 'Giorni e mesi', sub: 'Les jours et les mois', emoji: 'calendar', color: 'g', gen: genDays, rule: `
+    <p class="fr">lundi · mardi · mercredi · jeudi · vendredi · samedi · dimanche</p>
+    <p class="fr">janvier · février · mars · avril · mai · juin · juillet · août · septembre · octobre · novembre · décembre</p>
+    <div class="tip">${ic('bulb')} In francese si scrivono con la lettera <b>minuscola</b>. Attenti agli accenti: févr<b>i</b>er, ao<b>û</b>t, déc<b>e</b>mbre!</div>` },
+  { id: 'etre', title: 'Il verbo être', sub: 'Essere · presente', emoji: 'person', color: 'o', gen: genEtre, rule: `
+    <table>${ETRE_T.map(r => `<tr><td>${r[0]}</td><td class="fr">${r[1]}</td></tr>`).join('')}</table>
+    <div class="tip">${ic('bulb')} Esempio: <b>Nous sommes</b> amis. <b>Vous êtes</b> en retard.</div>` },
+  { id: 'avoir', title: 'Il verbo avoir', sub: 'Avere · presente', emoji: 'backpack', color: 'v', gen: genAvoir, rule: `
+    <table>${AVOIR_T.map(r => `<tr><td>${r[0]}</td><td class="fr">${r[1]}</td></tr>`).join('')}</table>
+    <div class="tip">${ic('bulb')} «je» + «ai» = <b>j'ai</b>. L'età si dice con avoir: <b>j'ai</b> onze ans (io <i>ho</i> 11 anni).</div>` },
+  { id: 'date', title: 'La data', sub: 'Je suis né(e) le…', emoji: 'cake', color: 'p', gen: genDate, wide: true, rule: `
+    <p><b>le</b> + numero + mese + anno</p>
+    <p class="fr">le quinze mars deux mille quatorze</p>
+    <p>Il giorno 1 si dice <b>premier</b>: <span class="fr">le premier mai</span></p>
+    <p>Anno: 2015 = <span class="fr">deux mille quinze</span></p>
+    <div class="tip">${ic('bulb')} Maschio: <b>Je suis né le</b>… · Femmina: <b>Je suis née le</b>…</div>` },
+  { id: 'blanc', title: 'Contrôle blanc', sub: 'Tutti gli argomenti mescolati: sei pronto per la verifica?', emoji: 'clipboard', color: 'w', gen: genBlanc, wide: true, rule: `
+    <p>14 domande su tutti gli argomenti: articoli, numeri, giorni e mesi, être, avoir e la data.</p>
+    <div class="tip">${ic('bulb')} Prova a farlo senza errori per prendere 3 stelle!</div>` }
+];
+const starStr = n => [0, 1, 2].map(i => i < n ? ic('star', 'f star-on') : ic('star', 'star-off')).join('');
+
+/* ============ HOME ============ */
+function home() {
+  closeSheet();
+  const tot = Object.values(S.stars).reduce((a, b) => a + b, 0);
+  const msg = tot === 0 ? 'Coco dice: tocca un post-it per cominciare!' : tot >= 24 ? 'Coco dice: sei un campione, bravissimo!' : 'Coco dice: continua così, ogni stella conta!';
+  app.innerHTML = `<div class="screen home"><div class="homeside">
+    <div class="homehead"><div><h1 class="hand">Mon carnet de français</h1>
+      <div class="stats">${ic('flame', 'flame')} ${streakNow()} ${streakNow() === 1 ? 'jour' : 'jours'} · ${ic('star', 'f star-on')} ${S.xp} XP · ${ic('medal', 'medal')} ${tot}/24</div></div>
+      <button class="iconbtn" id="snd" title="Audio on/off" aria-label="Audio">${ic(S.sound ? 'soundOn' : 'soundOff')}</button></div>
+    <div class="coco">${coco()}<div>${msg}</div></div>
+    <div class="homeprog"><div class="pbar"><i style="width:${tot / 24 * 100}%"></i></div><span>${tot} / 24 stelle raccolte</span></div>
+    <div class="sign">Prof. Flavio</div></div>
+    <div class="grid">${SECTIONS.map(s => `<button class="card ${s.color}${s.wide ? ' wide' : ''}" data-id="${s.id}"><i class="tape"></i>
+      <div class="e">${ic(s.emoji)}</div><div><b>${s.title}</b><small>${s.sub}</small>
+      <div class="stars">${starStr(S.stars[s.id] || 0)}</div></div></button>`).join('')}</div></div>`;
+  app.querySelectorAll('.card').forEach(c => c.onclick = () => openSheet(SECTIONS.find(s => s.id === c.dataset.id)));
+  document.getElementById('snd').onclick = () => { S.sound = !S.sound; save(); home(); if (S.sound) { unlockAudio(); speak('Bonjour !'); } };
+  window.scrollTo(0, 0);
+}
+function openSheet(sec) {
+  closeSheet();
+  const bg = document.createElement('div');
+  bg.className = 'sheetbg'; bg.id = 'sheet';
+  bg.innerHTML = `<div class="sheet ${sec.color}"><h3>${ic(sec.emoji)} ${sec.title}</h3><div class="sub">${sec.sub}</div>
+    <div class="rule">${sec.rule}</div>
+    <button class="btn" id="go">Comincia ▶</button><button class="btn ghost" id="cl">Chiudi</button></div>`;
+  bg.onclick = e => { if (e.target === bg) closeSheet(); };
+  document.body.appendChild(bg);
+  bg.querySelector('#go').onclick = () => { closeSheet(); startLesson(sec); };
+  bg.querySelector('#cl').onclick = closeSheet;
+}
+function closeSheet() { const s = document.getElementById('sheet'); if (s) s.remove(); }
+
+/* ============ LEZIONE ============ */
+let L = null;
+const heartsHTML = () => [0, 1, 2, 3, 4].map(i => i < Math.max(L.hearts, 0) ? ic('heart', 'f heart-on') : ic('heart', 'heart-off')).join('');
+function startLesson(sec) {
+  const qs = sec.gen();
+  L = { sec, queue: qs, total: qs.length, done: 0, hearts: 5, errors: 0 };
+  next();
+}
+function next() {
+  if (!L.queue.length) return finish();
+  L.q = L.queue.shift(); L.state = 'ask'; L.sel = null;
+  renderQ();
+}
+function sentence(q, inner) {
+  const sep = q.before && q.before.endsWith("'") ? '' : ' ';
+  return `<div class="sent">${q.before ? q.before + sep : ''}${inner} ${q.after}</div>`;
+}
+function sideHTML() {
+  const s = L.sec;
+  return `<aside class="lside"><div class="sidecard ${s.color}"><i class="tape"></i>
+    <div class="sidehead">${coco()}<div><b>${s.title}</b><small>${s.sub}</small></div></div>
+    <button class="btn ghost" id="ruleBtn">${ic('bulb')} <span>${L.showRule ? 'Nascondi la regola' : 'Mostra la regola'}</span></button>
+    <div class="rule" id="sideRule"${L.showRule ? '' : ' hidden'}>${s.rule}</div></div>
+    <div class="keys">${ic('keyboard')} <b>1, 2, 3…</b> per scegliere · <b>Invio</b> per controllare</div></aside>`;
+}
+function renderQ() {
+  const q = L.q;
+  const hearts = heartsHTML();
+  const sayBtn = q.promptSay ? `<button class="say" data-say="${q.promptSay}" aria-label="Ascolta">${ic('soundOn')}</button>` : '';
+  const prompt = q.prompt ? `<div class="big${q.mid || q.prompt.length > 10 ? ' mid' : ''}">${q.prompt}${sayBtn}</div>` : '';
+  let body = '';
+  if (q.kind === 'choice') {
+    const opts = `<div class="opts ${q.layout || ''}">${q.options.map((o, k) => `<button class="chip" data-v="${o}"><span class="kbd">${k + 1}</span>${o}</button>`).join('')}</div>`;
+    body = (q.after !== undefined ? sentence(q, '<span class="slot" id="slot">&nbsp;</span>') : prompt) + opts;
+  } else if (q.kind === 'type') {
+    body = q.after !== undefined
+      ? sentence(q, `<input class="inp inline" id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Risposta">`)
+      : prompt + `<input class="inp" id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${q.placeholder || ''}" aria-label="Risposta">`;
+  } else if (q.kind === 'match') {
+    const idx = q.pairs.map((_, i) => i);
+    body = `<div class="match"><div class="col">${shuffle(idx).map(i => `<button class="chip" data-side="l" data-i="${i}">${q.pairs[i][0]}</button>`).join('')}</div>
+      <div class="col">${shuffle(idx).map(i => `<button class="chip" data-side="r" data-i="${i}">${q.pairs[i][1]}</button>`).join('')}</div></div>`;
+  } else if (q.kind === 'order') {
+    body = prompt + `<div class="ansline" id="line"></div><div class="opts" id="bank">${q.tiles.map((t, i) => `<button class="chip small" data-i="${i}">${t}</button>`).join('')}</div>`;
+  } else if (q.kind === 'mydate') {
+    body = `<div class="hint">Come nella verifica: scrivi la tua data di nascita in francese.</div>
+      <div class="lbl">1. Scegli il giorno in cui sei nato/a</div>
+      <input type="date" class="dateinp" id="dt" min="2005-01-01" max="2020-12-31" value="2015-01-01">
+      <div class="itdate" id="itd"></div>
+      <div class="lbl">2. Scrivila in francese</div>
+      <input class="inp" id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="le …" aria-label="Data in francese">`;
+  }
+  app.innerHTML = `<div class="screen lesson"><div class="lmain">
+    <div class="lhead"><button class="x" id="quit" aria-label="Esci">${ic('close')}</button>
+      <div class="pbar"><i style="width:${L.done / L.total * 100}%"></i></div><span class="hearts">${hearts}</span></div>
+    <div class="tag">${q.tag}</div>
+    <h2 class="hand">${q.title}</h2>${q.hint && q.kind !== 'mydate' ? `<div class="hint">${q.hint}</div>` : ''}
+    ${body}
+    <div class="foot"><div id="fb"></div><button class="btn" id="main" disabled>${q.kind === 'match' ? 'Abbina tutte le coppie' : 'Controlla ✓'}</button></div></div>${sideHTML()}</div>`;
+  wireQ();
+  window.scrollTo(0, 0);
+}
+function wireQ() {
+  const q = L.q, main = document.getElementById('main');
+  const rb = document.getElementById('ruleBtn');
+  if (rb) rb.onclick = () => { L.showRule = !L.showRule; document.getElementById('sideRule').hidden = !L.showRule; rb.querySelector('span').textContent = L.showRule ? 'Nascondi la regola' : 'Mostra la regola'; };
+  document.getElementById('quit').onclick = () => { if (confirm('Vuoi uscire dalla lezione? I progressi di questa lezione andranno persi.')) home(); };
+  app.querySelectorAll('[data-say]').forEach(b => b.onclick = () => speak(b.dataset.say));
+  main.onclick = () => L.state === 'ask' ? check() : (L.hearts <= 0 ? fail() : next());
+  if (q.kind === 'choice') {
+    app.querySelectorAll('.opts .chip').forEach(c => c.onclick = () => {
+      if (L.state !== 'ask') return;
+      app.querySelectorAll('.opts .chip').forEach(x => x.classList.remove('sel'));
+      c.classList.add('sel'); L.sel = c.dataset.v; main.disabled = false;
+      const slot = document.getElementById('slot');
+      if (slot) { slot.textContent = L.sel; slot.classList.add('filled'); }
+    });
+  }
+  if (q.kind === 'type' || q.kind === 'mydate') {
+    const inp = document.getElementById('inp');
+    const upd = () => { main.disabled = !inp.value.trim() || (q.kind === 'mydate' && !document.getElementById('dt').value); };
+    inp.oninput = upd;
+    if (q.kind === 'mydate') {
+      const dt = document.getElementById('dt'), itd = document.getElementById('itd');
+      const showIt = () => { const v = dt.value.split('-'); itd.innerHTML = dt.value ? ic('calendar') + ' ' + dateIt(+v[2], +v[1] - 1, +v[0]) : ''; upd(); };
+      dt.oninput = dt.onchange = showIt; showIt();
+    } else setTimeout(() => inp.focus(), 50);
+  }
+  if (q.kind === 'order') {
+    const line = document.getElementById('line');
+    L.sel = [];
+    app.querySelectorAll('#bank .chip').forEach(c => c.onclick = () => {
+      if (L.state !== 'ask') return;
+      c.classList.add('hide'); L.sel.push(+c.dataset.i);
+      const t = document.createElement('button'); t.className = 'chip small'; t.textContent = q.tiles[c.dataset.i];
+      t.onclick = () => { if (L.state !== 'ask') return; t.remove(); c.classList.remove('hide'); L.sel.splice(L.sel.indexOf(+c.dataset.i), 1); main.disabled = !L.sel.length; };
+      line.appendChild(t); main.disabled = false;
+    });
+  }
+  if (q.kind === 'match') {
+    let selL = null, selR = null, left = q.pairs.length;
+    const tryPair = () => {
+      if (!selL || !selR) return;
+      const a = selL, b = selR; selL = selR = null;
+      if (a.dataset.i === b.dataset.i) {
+        [a, b].forEach(x => { x.classList.remove('sel'); x.classList.add('ok'); });
+        beep(true); speak(q.pairs[+a.dataset.i][1]);
+        setTimeout(() => [a, b].forEach(x => { x.classList.remove('ok'); x.classList.add('done'); }), 350);
+        if (--left === 0) { L.state = 'fb'; L.done++; showFb('ok', null); }
+      } else {
+        L.errors++; beep(false);
+        [a, b].forEach(x => { x.classList.remove('sel'); x.classList.add('ko', 'shake'); setTimeout(() => x.classList.remove('ko', 'shake'), 450); });
+      }
+    };
+    app.querySelectorAll('.match .chip').forEach(c => c.onclick = () => {
+      if (L.state !== 'ask' || c.classList.contains('done')) return;
+      const side = c.dataset.side;
+      app.querySelectorAll(`.match .chip[data-side="${side}"]`).forEach(x => x.classList.remove('sel'));
+      c.classList.add('sel');
+      if (side === 'l') selL = c; else selR = c;
+      tryPair();
+    });
+  }
+}
+function check() {
+  const q = L.q;
+  let res, sol;
+  if (q.kind === 'choice') {
+    res = L.sel === q.answer ? 'ok' : 'ko'; sol = q.answer;
+    app.querySelectorAll('.opts .chip').forEach(c => {
+      c.disabled = true; c.classList.remove('sel');
+      if (c.dataset.v === q.answer) c.classList.add('ok'); else if (c.dataset.v === L.sel) c.classList.add('ko');
+    });
+  } else if (q.kind === 'type') {
+    const inp = document.getElementById('inp');
+    res = grade(inp.value, q.answers); sol = q.answers[0];
+    inp.disabled = true; inp.classList.add(res === 'ko' ? 'ko' : 'ok');
+  } else if (q.kind === 'order') {
+    const got = L.sel.map(i => q.tiles[i]).join(' ');
+    res = norm(got) === norm(q.answer.join(' ')) ? 'ok' : 'ko'; sol = q.answer.join(' ');
+    app.querySelectorAll('#line .chip').forEach(c => c.classList.add(res));
+  } else if (q.kind === 'mydate') {
+    const v = document.getElementById('dt').value.split('-'), d = +v[2], m = +v[1] - 1, y = +v[0];
+    const inp = document.getElementById('inp');
+    res = grade(inp.value, dateAns(d, m, y)); sol = dateFr(d, m, y);
+    q.explain = `${dateIt(d, m, y)} = <b>${sol}</b><br>Nella verifica puoi scrivere: <b>Je suis né(e) ${sol}</b>.`;
+    q.say = sol;
+    inp.disabled = true; document.getElementById('dt').disabled = true; inp.classList.add(res === 'ko' ? 'ko' : 'ok');
+  }
+  L.state = 'fb';
+  if (res === 'ko') {
+    L.hearts--; L.errors++;
+    if (q.kind !== 'mydate') L.queue.push({ ...q, options: q.options ? shuffle(q.options) : q.options, tiles: q.tiles ? shuffle(q.tiles) : q.tiles });
+    else L.queue.push({ kind: 'mydate', tag: q.tag, title: 'Riprova!' });
+    document.querySelector('.screen').classList.add('shake');
+  } else L.done++;
+  showFb(res, sol);
+}
+const PRAISE = ['Bravo !', 'Super !', 'Génial !', 'Parfait !', 'Très bien !', 'Excellent !'];
+function showFb(res, sol) {
+  const q = L.q, main = document.getElementById('main');
+  document.querySelector('.pbar i').style.width = (L.done / L.total * 100) + '%';
+  document.querySelector('.hearts').innerHTML = heartsHTML();
+  const sayB = q.say ? `<button class="say" data-say="${q.say.replace(/"/g, '&quot;')}" aria-label="Ascolta">${ic('soundOn')}</button>` : '';
+  let html;
+  if (res === 'ok') html = `<div class="fb ok">${coco()}<div><div class="t">${rand(PRAISE)} ${sayB}</div>${q.say ? `<div class="ex">${q.say}</div>` : ''}</div></div>`;
+  else if (res === 'al') html = `<div class="fb al">${coco()}<div><div class="t">Quasi! Attento agli accenti: <b>${sol}</b> ${sayB}</div></div></div>`;
+  else html = `<div class="fb ko">${coco()}<div><div class="t">Risposta giusta: <b>${sol}</b> ${sayB}</div><div class="ex">${q.explain || ''}</div></div></div>`;
+  document.getElementById('fb').innerHTML = html;
+  document.querySelectorAll('#fb [data-say]').forEach(b => b.onclick = () => speak(b.dataset.say));
+  beep(res !== 'ko');
+  if (q.say) setTimeout(() => speak(q.say), 250);
+  main.disabled = false;
+  main.className = 'btn ' + (res === 'ko' ? 'ko' : 'ok');
+  main.textContent = L.hearts <= 0 ? 'Continua' : 'Continua →';
+  main.focus();
+}
+function finish() {
+  const st = L.errors === 0 ? 3 : L.errors <= 2 ? 2 : 1;
+  const prev = S.stars[L.sec.id] || 0;
+  S.stars[L.sec.id] = Math.max(prev, st);
+  const xp = 10 + st * 5;
+  S.xp += xp; bumpStreak(); save();
+  const title = st === 3 ? 'Parfait !' : st === 2 ? 'Très bien !' : 'Bien !';
+  const note = st === 3 ? 'Zero errori! Sei pronto per la verifica!'
+    : st === 2 ? `Solo ${L.errors} ${L.errors === 1 ? 'errore' : 'errori'}. Riprova per prendere 3 stelle!`
+    : `${L.errors} errori: rileggi la regola e riprova, migliorerai subito!`;
+  app.innerHTML = `<div class="screen res">${coco()}<h2>${title}</h2>
+    <div class="starsbig">${starStr(st)}</div>
+    <div class="hand" style="font-size:22px;color:var(--ink2)">+${xp} XP · ${ic('flame', 'flame')} ${streakNow()}</div>
+    <div class="note">${note}</div>
+    <div class="btns"><button class="btn" id="home">Torna al carnet</button><button class="btn ghost" id="again">Ripeti la lezione</button></div></div>`;
+  document.getElementById('home').onclick = home;
+  const sec = L.sec;
+  document.getElementById('again').onclick = () => startLesson(sec);
+  document.getElementById('home').focus();
+  if (st >= 2) confetti();
+  speak(title);
+}
+function fail() {
+  const sec = L.sec;
+  app.innerHTML = `<div class="screen res">${coco(true)}<h2>Oh là là !</h2>
+    <div class="note">Hai finito i cuori. Coco dice: rileggi la regola e riprova, ce la puoi fare!</div>
+    <div class="btns"><button class="btn" id="again">Riprova</button><button class="btn ghost" id="rule">Rileggi la regola</button><button class="btn ghost" id="home">Torna al carnet</button></div></div>`;
+  document.getElementById('again').onclick = () => startLesson(sec);
+  document.getElementById('rule').onclick = () => { home(); openSheet(sec); };
+  document.getElementById('home').onclick = home;
+  document.getElementById('again').focus();
+}
+function confetti() {
+  const cols = ['#ef3340', '#1d3a8a', '#f5a524', '#2e8b57', '#ffd3dc', '#cfe6ff', '#ffe9a8'];
+  for (let i = 0; i < 34; i++) {
+    const s = document.createElement('span');
+    s.className = 'confetti';
+    s.style.background = rand(cols);
+    if (Math.random() < .4) { s.style.width = s.style.height = '10px'; s.style.borderRadius = '50%'; }
+    s.style.left = Math.random() * 100 + 'vw';
+    s.style.animationDuration = (1.8 + Math.random() * 1.6) + 's';
+    s.style.animationDelay = Math.random() * .6 + 's';
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 4200);
+  }
+}
+
+/* Tastiera: Invio = Controlla / Continua, Esc = chiudi */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeSheet();
+  if (/^[1-9]$/.test(e.key) && L && L.state === 'ask' && L.q.kind === 'choice' && !document.getElementById('sheet') && document.activeElement.tagName !== 'INPUT') {
+    const c = app.querySelectorAll('.opts .chip')[+e.key - 1]; if (c) c.click();
+  }
+  if (e.key === 'Enter') {
+    const m = document.getElementById('main');
+    if (m && !m.disabled && document.activeElement !== m) { e.preventDefault(); m.click(); }
+  }
+});
+
+home();
+</script>
+</body>
+</html>
